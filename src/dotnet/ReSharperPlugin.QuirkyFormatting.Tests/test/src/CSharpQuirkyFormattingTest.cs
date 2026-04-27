@@ -1,6 +1,7 @@
 using JetBrains.ReSharper.FeaturesTestFramework.Formatter;
 using JetBrains.ReSharper.Plugins.QuirkyFormatting.Psi.CodeStyle.Formatting;
 using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.ReSharper.Psi.CSharp.CodeStyle.FormatSettings;
 using JetBrains.ReSharper.TestFramework;
 using NUnit.Framework;
 
@@ -47,4 +48,26 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
         true
     )]
     [Test] public void TestAlignAttributeInvocationCommas() { DoNamedTest2(); }
+
+    [TestSetting(
+        typeof(QuirkyFormattingSettingsKey),
+        nameof(QuirkyFormattingSettingsKey.INT_ALIGN_PARAMETERS),
+        true
+    )]
+    [TestSetting(
+        typeof(CSharpFormatSettingsKey),
+        nameof(CSharpFormatSettingsKey.WRAP_LINES),
+        false
+    )]
+    [TestSetting(
+        typeof(CSharpFormatSettingsKey),
+        nameof(CSharpFormatSettingsKey.INDENT_SIZE),
+        4
+    )]
+    [TestSetting(
+        typeof(CSharpFormatSettingsKey),
+        nameof(CSharpFormatSettingsKey.),
+        4
+    )]
+    [Test] public void TestAlignParameters() { DoNamedTest2(); }
 }

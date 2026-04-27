@@ -22,4 +22,7 @@ public class QuirkyFormattingSettingsKey
 
     [SettingsEntry(false, "Align commas in attribute usages")]
     public bool INT_ALIGN_ATTRIBUTE_COMMAS;
+
+    [SettingsEntry(false, "Align parameters in variable declaration groups")]
+    public bool INT_ALIGN_PARAMETERS;
 }
