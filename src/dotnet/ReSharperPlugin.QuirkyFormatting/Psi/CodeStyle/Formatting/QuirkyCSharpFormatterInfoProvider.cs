@@ -78,7 +78,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 Parent().Satisfies((node, _) => node is IObjectCreationExpression)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
+                x => x.INT_ALIGN_NEW_LPARENTH,
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -116,7 +116,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
+                x => x.INT_ALIGN_ARG_COMMA,
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -171,7 +171,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 Parent().Satisfies((node, _) => node is IObjectCreationExpression)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
+                x => x.INT_ALIGN_INITIALIZER_LBRACE,
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -205,7 +205,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 Parent().Satisfies((node, _) => node is IMemberInitializer)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
+                x => x.INT_ALIGN_MEMBER_INIT_EQ,
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -233,6 +233,9 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
     public override IEnumerable<IScalarSetting<bool>> PureIntAlignSettings()
     {
         // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS);
-        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_PARAMETERS);
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_NEW_LPARENTH);
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ARG_COMMA);
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_INITIALIZER_LBRACE);
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_MEMBER_INIT_EQ);
     }
 }

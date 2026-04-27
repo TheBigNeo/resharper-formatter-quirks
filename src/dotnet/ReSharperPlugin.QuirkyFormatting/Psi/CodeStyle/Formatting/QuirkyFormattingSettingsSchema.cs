@@ -37,8 +37,14 @@ public class QuirkyFormattingSettingsSchema : OthersPageSchemaPart
       //   "public static void Main(){LocalF(); void LocalF(){};}")
       // .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS,
       //   "[Attr(\r\nLittleString=\"smol\",\r\nLongString=\"This is some very long string literal\",\r\nLittleString1=\"smolagain\"\r\n)]\r\npublic static void Main(){}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_PARAMETERS,
+      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_NEW_LPARENTH,
+        "public static void Main(){var ShortName = new A(\"x\"); var LongerName = new LongerType(\"x\");}")
+      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ARG_COMMA,
         "public static void Main(){var ShortName = new A(\"x\", \"Short\", 1); var LongerName = new LongerType(\"x\", \"Longer name\", 2);}")
+      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_INITIALIZER_LBRACE,
+        "public static void Main(){var ShortName = new A(\"x\") { P = 1 }; var LongerName = new LongerType(\"x\") { P = 2 };}")
+      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_MEMBER_INIT_EQ,
+        "public static void Main(){var ShortName = new A { ShortProp = 1, LongerProperty = 2 }; var LongerName = new B { ShortProp = 3, LongerProperty = 4 };}")
       // .ItemFor((QuirkyFormattingSettingsKey x) => x.BANNER_STYLE_RIGHT_BRACE,
       //   "public static void Main(){Console.WriteLine();}")
 

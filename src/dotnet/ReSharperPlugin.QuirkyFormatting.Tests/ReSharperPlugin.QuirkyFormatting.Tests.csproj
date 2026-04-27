@@ -18,12 +18,7 @@
 
   <ItemGroup>
     <Compile Remove="test/**/*" />
-    <Compile Include="test\data\CodeFormatter\CSharp\AlignAttributeInvocationCommas.cs" />
     <Compile Include="test\data\CodeFormatter\CSharp\AlignParameters.cs" />
-    <Compile Include="test\data\CodeFormatter\CSharp\BannerStyleRightBrace.cs" />
-    <Compile Include="test\data\CodeFormatter\CSharp\LeftBraceLinebreaks.cs" />
-    <Compile Include="test\data\CodeFormatter\CSharp\LocalFunctionsLinebreaks.cs" />
-    <Compile Include="test\data\CodeFormatter\CSharp\StatementLinebreaks.cs" />
     <Compile Include="test\data\MyData.cs" />
     <Compile Include="test\src\CSharpQuirkyFormattingTest.cs" />
     <None Include="test/**/*" />
