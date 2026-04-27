@@ -291,69 +291,149 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .Build();
 
-        // Column 4: align '{' of object initializer after the closing ')' of constructor args
-        // DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-        //     .Name("ALIGN_PARAMETERS_INITIALIZER_LBRACE")
-        //     .Where(
-        //         Left().HasType(CSharpTokenType.RPARENTH),
-        //         Right().HasType(CSharpTokenType.LBRACE),
-        //         Parent().Satisfies((node, _) => node is IObjectCreationExpression)
-        //     )
-        //     .SwitchOnExternalKey(
-        //         x => x.INT_ALIGN_PARAMETERS,
-        //         When(true).Calculate(
-        //             (formattingRangeContext, _) =>
-        //             {
-        //                 if (formattingRangeContext == null) return null;
-        //                 var ctx = (FormattingRangeContext)formattingRangeContext;
-        //                 ITreeNode n3 = ctx.Parent;
-        //                 while (n3 != null)
-        //                 {
-        //                     if (n3 is IDeclarationStatement)
-        //                     {
-        //                         var blockOffset = GetContainingBlockOffset(n3);
-        //                         if (blockOffset == null) return null;
-        //                         return new IntAlignOptionValue($"Params$InitLBrace$Block{blockOffset}", QuirkyPriority);
-        //                     }
-        //                     n3 = n3.Parent;
-        //                 }
-        //                 return null;
-        //             }
-        //         )
-        //     )
-        //     .Build();
+        // Column 3b: align ',' after the 1st argument (index 0) of new TypeName(arg0, arg1, ...)
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name("ALIGN_PARAMETERS_ARG0_COMMA")
+            .Where(
+                Left().Satisfies((node, _) =>
+                {
+                    if (node is not ICSharpArgument arg) return false;
+                    var argList = arg.Parent as IArgumentList;
+                    if (argList == null) return false;
+                    var args = argList.Arguments;
+                    return args.Count > 1 && args[0] == arg;
+                }),
+                Right().HasType(CSharpTokenType.COMMA),
+                Parent().Satisfies((node, _) => node is IArgumentList)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_PARAMETERS,
+                When(true).Calculate(
+                    (formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n3b = ctx.Parent;
+                        while (n3b != null)
+                        {
+                            if (n3b is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n3b);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$Arg0Comma$Block{blockOffset}", QuirkyPriority);
+                            }
+                            n3b = n3b.Parent;
+                        }
+                        return null;
+                    }
+                )
+            )
+            .Build();
 
-        // Column 5: align '=' in object initializer member assignments
-        // DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-        //     .Name("ALIGN_PARAMETERS_MEMBER_INIT_EQ")
-        //     .Where(
-        //         Left().Satisfies((node, _) => node is IReferenceName),
-        //         Right().HasType(CSharpTokenType.EQ),
-        //         Parent().Satisfies((node, _) => node is IMemberInitializer)
-        //     )
-        //     .SwitchOnExternalKey(
-        //         x => x.INT_ALIGN_PARAMETERS,
-        //         When(true).Calculate(
-        //             (formattingRangeContext, _) =>
-        //             {
-        //                 if (formattingRangeContext == null) return null;
-        //                 var ctx = (FormattingRangeContext)formattingRangeContext;
-        //                 ITreeNode n4 = ctx.Parent;
-        //                 while (n4 != null)
-        //                 {
-        //                     if (n4 is IDeclarationStatement)
-        //                     {
-        //                         var blockOffset = GetContainingBlockOffset(n4);
-        //                         if (blockOffset == null) return null;
-        //                         return new IntAlignOptionValue($"Params$MemberEq$Block{blockOffset}", QuirkyPriority);
-        //                     }
-        //                     n4 = n4.Parent;
-        //                 }
-        //                 return null;
-        //             }
-        //         )
-        //     )
-        //     .Build();
+        // Column 3c: align ',' after the 5th argument (index 4) of new TypeName(arg0..arg4, arg5)
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name("ALIGN_PARAMETERS_ARG4_COMMA")
+            .Where(
+                Left().Satisfies((node, _) =>
+                {
+                    if (node is not ICSharpArgument arg) return false;
+                    var argList = arg.Parent as IArgumentList;
+                    if (argList == null) return false;
+                    var args = argList.Arguments;
+                    return args.Count > 4 && args[4] == arg;
+                }),
+                Right().HasType(CSharpTokenType.COMMA),
+                Parent().Satisfies((node, _) => node is IArgumentList)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_PARAMETERS,
+                When(true).Calculate(
+                    (formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n3c = ctx.Parent;
+                        while (n3c != null)
+                        {
+                            if (n3c is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n3c);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$Arg4Comma$Block{blockOffset}", QuirkyPriority);
+                            }
+                            n3c = n3c.Parent;
+                        }
+                        return null;
+                    }
+                )
+            )
+            .Build();
+
+        // Column 4: align the object initializer '{...}' node after the closing ')' of constructor args
+        // The Right() is IObjectInitializer (composite), not the '{' token directly
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name("ALIGN_PARAMETERS_INITIALIZER_LBRACE")
+            .Where(
+                Left().HasType(CSharpTokenType.RPARENTH),
+                Right().Satisfies((node, _) => node is IObjectInitializer),
+                Parent().Satisfies((node, _) => node is IObjectCreationExpression)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_PARAMETERS,
+                When(true).Calculate(
+                    (formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n4 = ctx.Parent;
+                        while (n4 != null)
+                        {
+                            if (n4 is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n4);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$InitLBrace$Block{blockOffset}", QuirkyPriority);
+                            }
+                            n4 = n4.Parent;
+                        }
+                        return null;
+                    }
+                )
+            )
+            .Build();
+
+        // Column 5: align '=' (Operator) in object initializer member assignments
+        // Parent is IMemberInitializer; Left() is the identifier token, Right() is the EQ token
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name("ALIGN_PARAMETERS_MEMBER_INIT_EQ")
+            .Where(
+                Left().Satisfies((node, _) => node is ITokenNode t && t.Parent is IMemberInitializer),
+                Right().HasType(CSharpTokenType.EQ),
+                Parent().Satisfies((node, _) => node is IMemberInitializer)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_PARAMETERS,
+                When(true).Calculate(
+                    (formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n5 = ctx.Parent;
+                        while (n5 != null)
+                        {
+                            if (n5 is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n5);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$MemberEq$Block{blockOffset}", QuirkyPriority);
+                            }
+                            n5 = n5.Parent;
+                        }
+                        return null;
+                    }
+                )
+            )
+            .Build();
     }
 
     public override IEnumerable<IScalarSetting<bool>> PureIntAlignSettings()
