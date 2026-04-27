@@ -29,18 +29,20 @@ public class QuirkyFormattingSettingsSchema : OthersPageSchemaPart
     // It is used to demo the setting's effect.
       
     builder
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LINE_BREAKS_BETWEEN_STATEMENTS,
-        "public static void Main(){Statement1(); Statement2();}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LINE_BREAKS_AFTER_LEFT_BRACES,
-        "public static void Main(){Statement();}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LOCAL_FUNCTION_DECLARATION_AND_INVOCATION_LINEBREAKS,
-        "public static void Main(){LocalF(); void LocalF(){};}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS,
-        "[Attr(\r\nLittleString=\"smol\",\r\nLongString=\"This is some very long string literal\",\r\nLittleString1=\"smolagain\"\r\n)]\r\npublic static void Main(){}")
+      // .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LINE_BREAKS_BETWEEN_STATEMENTS,
+      //   "public static void Main(){Statement1(); Statement2();}")
+      // .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LINE_BREAKS_AFTER_LEFT_BRACES,
+      //   "public static void Main(){Statement();}")
+      // .ItemFor((QuirkyFormattingSettingsKey x) => x.ENFORCE_LOCAL_FUNCTION_DECLARATION_AND_INVOCATION_LINEBREAKS,
+      //   "public static void Main(){LocalF(); void LocalF(){};}")
+      // .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS,
+      //   "[Attr(\r\nLittleString=\"smol\",\r\nLongString=\"This is some very long string literal\",\r\nLittleString1=\"smolagain\"\r\n)]\r\npublic static void Main(){}")
       .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_PARAMETERS,
         "public static void Main(){var ShortName = new A(\"x\", \"Short\", 1); var LongerName = new LongerType(\"x\", \"Longer name\", 2);}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.BANNER_STYLE_RIGHT_BRACE,
-        "public static void Main(){Console.WriteLine();}");
+      // .ItemFor((QuirkyFormattingSettingsKey x) => x.BANNER_STYLE_RIGHT_BRACE,
+      //   "public static void Main(){Console.WriteLine();}")
+
+      ;
 
     // Don't call Build() here, it will complain.
     // Build() is called in the parent schema's Describe() method.
