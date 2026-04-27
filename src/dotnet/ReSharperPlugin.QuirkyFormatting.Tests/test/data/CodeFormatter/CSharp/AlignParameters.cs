@@ -1,8 +1,6 @@
-namespace ReSharperPlugin.QuirkyFormatting.Tests.test.data.CodeFormatter.CSharp;
-
 internal sealed class StringSetting
 {
-    public StringSetting(object? o1, object? o2 = null, object? o3 = null, object? o4 = null, object? o5 = null, object? o6 = null)
+    public StringSetting(object o1, object o2 = null, object o3 = null, object o4 = null, object o5 = null, object o6 = null)
     {
     }
 
@@ -12,7 +10,7 @@ internal sealed class StringSetting
 
 internal sealed class UShortSetting
 {
-    public UShortSetting(object? o1, object? o2 = null, object? o3 = null, object? o4 = null, object? o5 = null, object? o6 = null)
+    public UShortSetting(object o1, object o2 = null, object o3 = null, object o4 = null, object o5 = null, object o6 = null)
     {
     }
 
@@ -22,7 +20,7 @@ internal sealed class UShortSetting
 
 internal sealed class IntSetting
 {
-    public IntSetting(object? o1, object? o2 = null, object? o3 = null, object? o4 = null, object? o5 = null, object? o6 = null)
+    public IntSetting(object o1, object o2 = null, object o3 = null, object o4 = null, object o5 = null, object o6 = null)
     {
     }
 
@@ -32,7 +30,7 @@ internal sealed class IntSetting
 
 internal sealed class BoolSetting
 {
-    public BoolSetting(object? o1, object? o2 = null, object? o3 = null, object? o4 = null, object? o5 = null, object? o6 = null)
+    public BoolSetting(object o1, object o2 = null, object o3 = null, object o4 = null, object o5 = null, object o6 = null)
     {
     }
 
