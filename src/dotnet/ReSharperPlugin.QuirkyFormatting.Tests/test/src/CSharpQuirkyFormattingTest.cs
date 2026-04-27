@@ -14,60 +14,49 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
 {
     protected override string RelativeTestDataPath => "CodeFormatter/CSharp";
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey),
-        nameof(QuirkyFormattingSettingsKey.ENFORCE_LINE_BREAKS_BETWEEN_STATEMENTS), 
-        false
-    )]
-    [Test] public void TestStatementLinebreaks() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.ENFORCE_LINE_BREAKS_BETWEEN_STATEMENTS), false)]
+    [Test]
+    public void TestStatementLinebreaks()
+    {
+        DoNamedTest2();
+    }
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey), 
-        nameof(QuirkyFormattingSettingsKey.ENFORCE_LINE_BREAKS_AFTER_LEFT_BRACES), 
-        false
-    )]
-    [Test] public void TestLeftBraceLinebreaks() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.ENFORCE_LINE_BREAKS_AFTER_LEFT_BRACES), false)]
+    [Test]
+    public void TestLeftBraceLinebreaks()
+    {
+        DoNamedTest2();
+    }
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey), 
-        nameof(QuirkyFormattingSettingsKey.BANNER_STYLE_RIGHT_BRACE),
-        true
-    )]
-    [Test] public void TestBannerStyleRightBrace() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.BANNER_STYLE_RIGHT_BRACE), true)]
+    [Test]
+    public void TestBannerStyleRightBrace()
+    {
+        DoNamedTest2();
+    }
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey),
-        nameof(QuirkyFormattingSettingsKey.ENFORCE_LOCAL_FUNCTION_DECLARATION_AND_INVOCATION_LINEBREAKS), 
-        false
-    )]
-    [Test] public void TestLocalFunctionsLinebreaks() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.ENFORCE_LOCAL_FUNCTION_DECLARATION_AND_INVOCATION_LINEBREAKS), false)]
+    [Test]
+    public void TestLocalFunctionsLinebreaks()
+    {
+        DoNamedTest2();
+    }
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey),
-        nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ATTRIBUTE_COMMAS), 
-        true
-    )]
-    [Test] public void TestAlignAttributeInvocationCommas() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ATTRIBUTE_COMMAS), true)]
+    [Test]
+    public void TestAlignAttributeInvocationCommas()
+    {
+        DoNamedTest2();
+    }
 
-    [TestSetting(
-        typeof(QuirkyFormattingSettingsKey),
-        nameof(QuirkyFormattingSettingsKey.INT_ALIGN_PARAMETERS),
-        true
-    )]
-    [TestSetting(
-        typeof(CSharpFormatSettingsKey),
-        nameof(CSharpFormatSettingsKey.WRAP_LINES),
-        false
-    )]
-    [TestSetting(
-        typeof(CSharpFormatSettingsKey),
-        nameof(CSharpFormatSettingsKey.INDENT_SIZE),
-        4
-    )]
-    [TestSetting(
-        typeof(CSharpFormatSettingsKey),
-        nameof(CSharpFormatSettingsKey.),
-        4
-    )]
-    [Test] public void TestAlignParameters() { DoNamedTest2(); }
+    [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_PARAMETERS), true)]
+    [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.WRAP_LINES), false)]
+    // [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INDENT_SIZE), 4)]
+    [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES), true)]
+    [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_INVOCATIONS), true)]
+    [Test]
+    public void TestAlignParameters()
+    {
+        DoNamedTest2();
+    }
 }

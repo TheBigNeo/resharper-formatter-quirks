@@ -6,13 +6,13 @@ public class AlignParameters
   {
     int SettingsSortIndex = 1;
 
-    var CoreName             = new StringSetting("6e7ec020-1657-4d40-9c17-dcade0c6415d", "Core Name"                  , ++SettingsSortIndex, true, HtmlFieldType.Text, "Core 1");
-    var ApiAddress           = new StringSetting("a111683e-edfd-443d-b8fc-4407a5fb14ba", "Core IP-Address or Hostname", ++SettingsSortIndex, true, HtmlFieldType.Url,  "127.0.0.1") { HtmlFieldWidth = 6 };
-    var ApiPort              = new UShortSetting("f831819e-61c4-4915-ac7a-9b6adceb46fd", "Listen Port API"            , ++SettingsSortIndex, true, 8085)                            { HtmlFieldWidth = 6 };
-    var PulseDuration        = new IntSetting   ("bfdde1fe-311f-47d0-9ad3-40f09f950501", "Pulse Duration"             , ++SettingsSortIndex, true, 250)                             { Description    = "In ms" };
-    var UseWebSocketsOverTls = new BoolSetting  ("0d347821-a746-4c86-a54d-0b64a40fe8d5", "Use WebSockets over TLS"    , ++SettingsSortIndex, false)                                 { Description    = "WebSocket Secure" };
-    var WebSocketPort        = new UShortSetting("c89bc913-416d-43d6-9fe9-8c9133e6c50b", "WebSocket Port"             , ++SettingsSortIndex, true, 4444);
+    var CoreName             = new StringSetting("-1657-4d40-9c17-dcade0c6415d"        , "Core Name"                  , ++SettingsSortIndex, true, HtmlFieldType.Text, "Core 1");
+    var ApiAddress           = new StringSetting("a111683e--443d-b8fc-4407a5fb14ba"    , "Core IP-Address or Hostname", ++SettingsSortIndex, true, HtmlFieldType.Url , "127.0.0.1") { HtmlFieldWidth = 6 };
+    var ApiPort              = new UShortSetting("f831819e-61c4-4915--9b6adceb46fd"    , "Listen Port API"            , ++SettingsSortIndex, true, 8085)                            { HtmlFieldWidth = 6 };
+    var PulseDuration        = new IntSetting   ("bfdde1fe-311f-47d0-9ad3-"            , "Pulse Duration"             , ++SettingsSortIndex, true, 250)                             { Description    = "In ms" };
+    var UseWebSocketsOverTls = new BoolSetting  ("-4c86-a54d-0b64a40fe8d5"             , "Use WebSockets over TLS"    , ++SettingsSortIndex, false)                                 { Description    = "WebSocket Secure" };
+    var WebSocketPort        = new UShortSetting("c89bc913-"                           , "WebSocket Port"             , ++SettingsSortIndex, true, 4444);
     var ShutdownActions      = new StringSetting("9acd45ec-e8b9-45ad-b136-ecdeecd87074", "Shutdown Actions"           , ++SettingsSortIndex, false, HtmlFieldType.Text, null);
-    var StartupActions       = new StringSetting("8ee93ce0-d33d-46cb-b462-caf5ff1a5983", "Startup Actions"            , ++SettingsSortIndex, false, HtmlFieldType.Text, null);
+    var StartupActions       = new StringSetting("caf5ff1a5983"                        , "Startup Actions"            , ++SettingsSortIndex, false, HtmlFieldType.Text, null);
   }
 }
