@@ -44,8 +44,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // IntAlignRule    -> To describe some kind of column-based formatting
         // ...
 
-        // QuirkyLineBreaks();
-        // QuirkyIntAlign();
+        QuirkyLineBreaks();
+        QuirkyIntAlign();
         QuirkyAlignParameters();
     }
 
@@ -105,17 +105,15 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Group(LineBreaksRuleGroup)
             .Name("LOCAL_FUNCTION_DECLARATION_AND_INVOCATION_LINEBREAKS")
             .Where(
-                Left().Satisfies(
-                    (node, _) =>
-                        node is IExpressionStatement expressionStatement &&
-                        expressionStatement.HasLocalFunctionInvocation()
+                Left().Satisfies((node, _) =>
+                    node is IExpressionStatement expressionStatement &&
+                    expressionStatement.HasLocalFunctionInvocation()
                 ),
-                Right().Satisfies(
-                    (node, _) =>
-                        node is IDeclarationStatement { LocalFunctionDeclaration: { } localFunctionDeclaration }
-                        && node.LeftSiblings().OfType<IExpressionStatement>().FirstOrDefault() is
-                            { } expressionStatement
-                        && expressionStatement.GetInvokedLocalFunctionDeclarations().Contains(localFunctionDeclaration)
+                Right().Satisfies((node, _) =>
+                    node is IDeclarationStatement { LocalFunctionDeclaration: { } localFunctionDeclaration }
+                    && node.LeftSiblings().OfType<IExpressionStatement>().FirstOrDefault() is
+                        { } expressionStatement
+                    && expressionStatement.GetInvokedLocalFunctionDeclarations().Contains(localFunctionDeclaration)
                 )
             )
             .SwitchOnExternalKey(
@@ -141,8 +139,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_ATTRIBUTE_COMMAS,
-                When(true).Calculate(
-                    (formattingRangeContext, context) =>
+                When(true).Calculate((formattingRangeContext, context) =>
                     {
                         if (formattingRangeContext == null && context == null) return null;
 
@@ -172,47 +169,9 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                     return block.GetDocumentStartOffset().Offset;
                 n = n.Parent;
             }
+
             return null;
         }
-
-        // Helper: check that a node is a local variable declaration whose initializer is an object creation expression
-        static bool IsVarDeclWithObjectCreation(ITreeNode node)
-        {
-            if (node is not IDeclarationStatement declStmt) return false;
-            var multiDecl = declStmt.Declaration as IMultipleLocalVariableDeclaration;
-            if (multiDecl == null) return false;
-            var single = multiDecl.Declarators.SingleOrDefault() as ILocalVariableDeclaration;
-            if (single == null) return false;
-            return single.Initial is IExpressionInitializer { Value: IObjectCreationExpression };
-        }
-
-        // Column 1: align '=' in "var Name = new ..." local declarations
-        // The '=' (EquivalenceSign) is inside ILocalVariableDeclaration, left of it is the name identifier
-        // DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-        //     .Name("ALIGN_PARAMETERS_VAR_EQ")
-        //     .Where(
-        //         Left().Satisfies((node, _) => node is ITokenNode token && token.Parent is ILocalVariableDeclaration),
-        //         Right().HasType(CSharpTokenType.EQ),
-        //         Parent().Satisfies((node, _) =>
-        //         {
-        //             if (node is not ILocalVariableDeclaration varDecl) return false;
-        //             return varDecl.Initial is IExpressionInitializer { Value: IObjectCreationExpression };
-        //         })
-        //     )
-        //     .SwitchOnExternalKey(
-        //         x => x.INT_ALIGN_PARAMETERS,
-        //         When(true).Calculate(
-        //             (formattingRangeContext, _) =>
-        //             {
-        //                 if (formattingRangeContext == null) return null;
-        //                 var ctx = (FormattingRangeContext)formattingRangeContext;
-        //                 var blockOffset = GetContainingBlockOffset(ctx.Parent);
-        //                 if (blockOffset == null) return null;
-        //                 return new IntAlignOptionValue($"Params$VarEq$Block{blockOffset}", QuirkyPriority);
-        //             }
-        //         )
-        //     )
-        //     .Build();
 
 
         // ============================================
@@ -229,8 +188,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
+                When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
@@ -244,125 +202,68 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 if (blockOffset == null) return null;
                                 return new IntAlignOptionValue($"Params$LParen$Block{blockOffset}", QuirkyPriority);
                             }
+
                             n = n.Parent;
                         }
+
                         return null;
                     }
                 )
             )
             .Build();
 
-        // Column 3: align ',' after the 2nd argument (index 1) of new TypeName(arg0, arg1, ...)
+        // Column 3: align ',' after each argument at position N — one rule for all indices.
+        // The group key encodes both the argument position and the containing block, so commas
+        // at the same position across sibling var-declarations are aligned as a column.
+        // The argument index is determined by counting COMMA tokens in the IArgumentList that
+        // precede the Right() COMMA token — i.e. commaIndex == argIndex of the left argument.
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name("ALIGN_PARAMETERS_ARG1_COMMA")
+            .Name("ALIGN_PARAMETERS_ARG_COMMA")
             .Where(
-                Left().Satisfies((node, _) =>
-                {
-                    if (node is not ICSharpArgument arg) return false;
-                    var argList = arg.Parent as IArgumentList;
-                    if (argList == null) return false;
-                    var args = argList.Arguments;
-                    return args.Count > 1 && args[1] == arg;
-                }),
+                Left().Satisfies((node, _) => node is ICSharpArgument),
                 Right().HasType(CSharpTokenType.COMMA),
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
+                When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n2 = ctx.Parent;
-                        while (n2 != null)
-                        {
-                            if (n2 is IDeclarationStatement)
-                            {
-                                var blockOffset = GetContainingBlockOffset(n2);
-                                if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$Arg1Comma$Block{blockOffset}", QuirkyPriority);
-                            }
-                            n2 = n2.Parent;
-                        }
-                        return null;
-                    }
-                )
-            )
-            .Build();
 
-        // Column 3b: align ',' after the 1st argument (index 0) of new TypeName(arg0, arg1, ...)
-        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name("ALIGN_PARAMETERS_ARG0_COMMA")
-            .Where(
-                Left().Satisfies((node, _) =>
-                {
-                    if (node is not ICSharpArgument arg) return false;
-                    var argList = arg.Parent as IArgumentList;
-                    if (argList == null) return false;
-                    var args = argList.Arguments;
-                    return args.Count > 1 && args[0] == arg;
-                }),
-                Right().HasType(CSharpTokenType.COMMA),
-                Parent().Satisfies((node, _) => node is IArgumentList)
-            )
-            .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
-                    {
-                        if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n3b = ctx.Parent;
-                        while (n3b != null)
+                        // ctx.Parent is IArgumentList; find the index of the argument to the left
+                        // of this comma by walking the structured Arguments list.
+                        // For each argument, find its index, then check if the next significant
+                        // sibling token is a COMMA — the first match gives us the arg index.
+                        if (ctx.Parent is not IArgumentList argList) return null;
+                        var arguments = argList.Arguments;
+                        var argIndex  = 0;
+                        for (var i = 0; i < arguments.Count; i++)
                         {
-                            if (n3b is IDeclarationStatement)
+                            // Walk right from this argument to find the next significant token
+                            var sibling = arguments[i].NextSibling;
+                            while (sibling != null && sibling is IWhitespaceNode)
+                                sibling = sibling.NextSibling;
+                            if (sibling is ITokenNode nextToken && nextToken.GetTokenType() == CSharpTokenType.COMMA)
                             {
-                                var blockOffset = GetContainingBlockOffset(n3b);
-                                if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$Arg0Comma$Block{blockOffset}", QuirkyPriority);
+                                argIndex = i;
+                                break;
                             }
-                            n3b = n3b.Parent;
                         }
-                        return null;
-                    }
-                )
-            )
-            .Build();
 
-        // Column 3c: align ',' after the 5th argument (index 4) of new TypeName(arg0..arg4, arg5)
-        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name("ALIGN_PARAMETERS_ARG4_COMMA")
-            .Where(
-                Left().Satisfies((node, _) =>
-                {
-                    if (node is not ICSharpArgument arg) return false;
-                    var argList = arg.Parent as IArgumentList;
-                    if (argList == null) return false;
-                    var args = argList.Arguments;
-                    return args.Count > 4 && args[4] == arg;
-                }),
-                Right().HasType(CSharpTokenType.COMMA),
-                Parent().Satisfies((node, _) => node is IArgumentList)
-            )
-            .SwitchOnExternalKey(
-                x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
-                    {
-                        if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n3c = ctx.Parent;
-                        while (n3c != null)
+                        ITreeNode n = ctx.Parent;
+                        while (n != null)
                         {
-                            if (n3c is IDeclarationStatement)
+                            if (n is IDeclarationStatement)
                             {
-                                var blockOffset = GetContainingBlockOffset(n3c);
+                                var blockOffset = GetContainingBlockOffset(n);
                                 if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$Arg4Comma$Block{blockOffset}", QuirkyPriority);
+                                return new IntAlignOptionValue($"Params$ArgComma{argIndex}$Block{blockOffset}", QuirkyPriority);
                             }
-                            n3c = n3c.Parent;
+
+                            n = n.Parent;
                         }
+
                         return null;
                     }
                 )
@@ -380,12 +281,11 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
+                When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n4 = ctx.Parent;
+                        var       ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n4  = ctx.Parent;
                         while (n4 != null)
                         {
                             if (n4 is IDeclarationStatement)
@@ -394,8 +294,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 if (blockOffset == null) return null;
                                 return new IntAlignOptionValue($"Params$InitLBrace$Block{blockOffset}", QuirkyPriority);
                             }
+
                             n4 = n4.Parent;
                         }
+
                         return null;
                     }
                 )
@@ -413,12 +315,11 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_PARAMETERS,
-                When(true).Calculate(
-                    (formattingRangeContext, _) =>
+                When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n5 = ctx.Parent;
+                        var       ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n5  = ctx.Parent;
                         while (n5 != null)
                         {
                             if (n5 is IDeclarationStatement)
@@ -427,8 +328,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 if (blockOffset == null) return null;
                                 return new IntAlignOptionValue($"Params$MemberEq$Block{blockOffset}", QuirkyPriority);
                             }
+
                             n5 = n5.Parent;
                         }
+
                         return null;
                     }
                 )
@@ -438,11 +341,9 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
     public override IEnumerable<IScalarSetting<bool>> PureIntAlignSettings()
     {
-        yield return CalculatedSettingsSchema.GetScalarSetting(
-            (QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS
         );
-        yield return CalculatedSettingsSchema.GetScalarSetting(
-            (QuirkyFormattingSettingsKey x) => x.INT_ALIGN_PARAMETERS
+        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_PARAMETERS
         );
     }
 }

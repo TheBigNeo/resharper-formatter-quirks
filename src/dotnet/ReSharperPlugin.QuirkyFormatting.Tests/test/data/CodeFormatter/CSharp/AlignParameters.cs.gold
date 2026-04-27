@@ -11,7 +11,7 @@ public class AlignParameters
     var ApiPort              = new UShortSetting("f831819e-61c4-4915--9b6adceb46fd"    , "Listen Port API"            , ++SettingsSortIndex, true, 8085)                            { HtmlFieldWidth = 6 };
     var PulseDuration        = new IntSetting   ("bfdde1fe-311f-47d0-9ad3-"            , "Pulse Duration"             , ++SettingsSortIndex, true, 250)                             { Description    = "In ms" };
     var UseWebSocketsOverTls = new BoolSetting  ("-4c86-a54d-0b64a40fe8d5"             , "Use WebSockets over TLS"    , ++SettingsSortIndex, false)                                 { Description    = "WebSocket Secure" };
-    var WebSocketPort        = new UShortSetting("c89bc913-"                           , "WebSocket Port"             , ++SettingsSortIndex, true, 4444);
+    var WebSocketPort        = new UShortSetting("c89bc913-"                           , "WebSocket Port"             , ++SettingsSortIndex, true , 4444);
     var ShutdownActions      = new StringSetting("9acd45ec-e8b9-45ad-b136-ecdeecd87074", "Shutdown Actions"           , ++SettingsSortIndex, false, HtmlFieldType.Text, null);
     var StartupActions       = new StringSetting("caf5ff1a5983"                        , "Startup Actions"            , ++SettingsSortIndex, false, HtmlFieldType.Text, null);
   }
