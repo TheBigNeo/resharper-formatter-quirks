@@ -23,15 +23,15 @@ public class QuirkyFormattingSettingsKey
     // [SettingsEntry(false, "Align commas in attribute usages")]
     // public bool INT_ALIGN_ATTRIBUTE_COMMAS;
 
-    [SettingsEntry(false, "Align '(' after type name in 'new T(' constructor calls")]
+    [SettingsEntry(true , "Align '(' after type name in 'new T(' constructor calls")]
     public bool INT_ALIGN_NEW_LPARENTH;
 
-    [SettingsEntry(false, "Align argument commas by position across sibling declarations")]
+    [SettingsEntry(true, "Align argument commas by position across sibling declarations")]
     public bool INT_ALIGN_ARG_COMMA;
 
-    [SettingsEntry(false, "Align object initializer '{' after constructor ')'")]
+    [SettingsEntry(true, "Align object initializer '{' after constructor ')'")]
     public bool INT_ALIGN_INITIALIZER_LBRACE;
 
-    [SettingsEntry(false, "Align '=' in object initializer member assignments")]
+    [SettingsEntry(true, "Align '=' in object initializer member assignments")]
     public bool INT_ALIGN_MEMBER_INIT_EQ;
 }
