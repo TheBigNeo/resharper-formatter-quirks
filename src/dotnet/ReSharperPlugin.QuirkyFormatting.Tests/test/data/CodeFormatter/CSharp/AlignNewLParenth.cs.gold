@@ -1,6 +1,6 @@
 using ReSharperPlugin.QuirkyFormatting.Tests.test.data;
 
-public class AlignParameters
+public class AlignNewLParenth
 {
   static void Main(string[] args)
   {

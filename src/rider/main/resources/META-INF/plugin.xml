@@ -1,14 +1,14 @@
 <idea-plugin require-restart="true">
   <id>com.jetbrains.rider.plugins.quirkyformatting</id>
   <name>QuirkyFormatting</name>
-  <version>_PLACEHOLDER_</version>
+  <version>2026.04.28</version>
   <vendor url="https://project-url">Author</vendor>
   <idea-version since-build="_PLACEHOLDER_" until-build="_PLACEHOLDER_" />
   <depends>com.intellij.modules.rider</depends>
 
   <description>
 <![CDATA[
-<p>Sample description</p>
+<p>Sample description My CAKE</p>
 ]]>
   </description>
 
