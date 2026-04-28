@@ -78,7 +78,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Where(
                 leftCondition,
                 rightCondition,
-                Parent().Satisfies((node, _) => node is IArgumentList)
+                Parent().Satisfies((node, _) => node is IArgumentList { Parent: IObjectCreationExpression })
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
@@ -146,7 +146,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Where(
                 leftCondition,
                 rightCondition,
-                Parent().Satisfies((node, _) => node is IArgumentList)
+                Parent().Satisfies((node, _) => node is IArgumentList { Parent: IInvocationExpression })
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
@@ -178,13 +178,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 var blockOffset = GetContainingBlockOffset(n);
                                 if (blockOffset == null) return null;
 
-                                // Derive a stable method-name key from the invocation so that only
-                                // calls to the same method are grouped into the same alignment column.
-                                var methodName = "";
-                                if (argList.Parent is IInvocationExpression invocation)
-                                    methodName = invocation.InvokedExpression.GetText();
-
-                                return new IntAlignOptionValue($"Func${keyPrefix}{argIndex}${methodName}$Block{blockOffset}", QuirkyPriority);
+                                return new IntAlignOptionValue($"Func${keyPrefix}{argIndex}$Block{blockOffset}", QuirkyPriority);
                             }
 
                             n = n.Parent;
