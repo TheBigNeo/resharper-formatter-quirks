@@ -47,6 +47,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma();
         INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma();
         INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma();
+        INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceAfterComma();
         AddALIGN_PARAMETERS_LPARENTH();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
@@ -122,19 +123,34 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
     }
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma()
+        => BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition.SpaceBeforeComma);
+
+    private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceAfterComma()
+        => BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition.SpaceAfterComma);
+
+    private void BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition position)
     {
-        // Same rule for function/method call expressions (IExpressionStatement parent instead of IDeclarationStatement).
-        // Groups by method name + arg index + containing block so that calls to the same method are aligned together.
+        var isSpaceBefore = position == AlignCommaPosition.SpaceBeforeComma;
+        var nameSuffix = isSpaceBefore ? "" : "_SpaceAfter";
+        var keyPrefix = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
+
+        var leftCondition = isSpaceBefore
+            ? Left().Satisfies((node, _) => node is ICSharpArgument)
+            : Left().HasType(CSharpTokenType.COMMA);
+        var rightCondition = isSpaceBefore
+            ? Right().HasType(CSharpTokenType.COMMA)
+            : Right().Satisfies((node, _) => node is ICSharpArgument);
+
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + "_Function")
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION) + nameSuffix)
             .Where(
-                Left().Satisfies((node, _) => node is ICSharpArgument),
-                Right().HasType(CSharpTokenType.COMMA),
+                leftCondition,
+                rightCondition,
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
-                When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
+                x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
+                When(position).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
@@ -144,10 +160,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         var argIndex = 0;
                         for (var i = 0; i < arguments.Count; i++)
                         {
-                            var sibling = arguments[i].NextSibling;
+                            var sibling = isSpaceBefore ? arguments[i].NextSibling : arguments[i].PrevSibling;
                             while (sibling != null && sibling is IWhitespaceNode)
-                                sibling = sibling.NextSibling;
-                            if (sibling is ITokenNode nextToken && nextToken.GetTokenType() == CSharpTokenType.COMMA)
+                                sibling = isSpaceBefore ? sibling.NextSibling : sibling.PrevSibling;
+                            if (sibling is ITokenNode token && token.GetTokenType() == CSharpTokenType.COMMA)
                             {
                                 argIndex = i;
                                 break;
@@ -168,7 +184,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 if (argList.Parent is IInvocationExpression invocation)
                                     methodName = invocation.InvokedExpression.GetText();
 
-                                return new IntAlignOptionValue($"Func$ArgComma{argIndex}${methodName}$Block{blockOffset}", QuirkyPriority);
+                                return new IntAlignOptionValue($"Func${keyPrefix}{argIndex}${methodName}$Block{blockOffset}", QuirkyPriority);
                             }
 
                             n = n.Parent;
