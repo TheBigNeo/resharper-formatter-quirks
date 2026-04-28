@@ -11,8 +11,8 @@ public class QuirkyFormattingSettingsKey
     [SettingsEntry(AlignCommaPosition.DoNotChange, "Align argument commas by position across sibling declarations")]
     public AlignCommaPosition INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR;
 
-    [SettingsEntry(false, "Align argument commas by position across sibling declarations")]
-    public bool INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION;
+    [SettingsEntry(AlignCommaPosition.DoNotChange, "Align argument commas by position across sibling declarations")]
+    public AlignCommaPosition INT_ALIGN_ARGUMENTS_IN_FUNCTION;
 
     [SettingsEntry(false, "Align '(' after type name in 'new T(' constructor calls")]
     public bool INT_ALIGN_NEW_LPARENTH;

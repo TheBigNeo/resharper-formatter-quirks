@@ -22,3 +22,4 @@ _ReSharper*
 _dotTrace*
 
 packages
+/src/dotnet/ReSharperPlugin.QuirkyFormatting.Tests/test/data/CodeFormatter/CSharp/AlignArgumentsInConstructor_SpaceBeforeComma.cs.tmp

@@ -1,7 +1,7 @@
 using JetBrains.ReSharper.Plugins.QuirkyFormatting.Psi.CodeStyle.Formatting;
 using ReSharperPlugin.QuirkyFormatting.Tests.test.data;
 
-/// <seealso cref="QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION"/>
+/// <seealso cref="QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION"/>
 internal class AlignCommaAfterArgumentInFunction
 {
   static void CallFunctions()

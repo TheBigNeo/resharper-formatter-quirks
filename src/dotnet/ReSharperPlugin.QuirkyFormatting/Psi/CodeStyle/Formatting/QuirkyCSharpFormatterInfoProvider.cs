@@ -53,80 +53,35 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
     }
 
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma()
-    {
-        // Column 3: align ',' after each argument at position N — one rule for all indices.
-        // The group key encodes both the argument position and the containing block, so commas
-        // at the same position across sibling var-declarations are aligned as a column.
-        // The argument index is determined by counting COMMA tokens in the IArgumentList that
-        // precede the Right() COMMA token — i.e. commaIndex == argIndex of the left argument.
-        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR))
-            .Where(
-                Left().Satisfies((node, _) => node is ICSharpArgument),
-                Right().HasType(CSharpTokenType.COMMA),
-                Parent().Satisfies((node, _) => node is IArgumentList)
-            )
-            .SwitchOnExternalKey(
-                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
-                When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
-                    {
-                        if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-
-                        // ctx.Parent is IArgumentList; find the index of the argument to the left
-                        // of this comma by walking the structured Arguments list.
-                        // For each argument, find its index, then check if the next significant
-                        // sibling token is a COMMA — the first match gives us the arg index.
-                        if (ctx.Parent is not IArgumentList argList) return null;
-                        var arguments = argList.Arguments;
-                        var argIndex = 0;
-                        for (var i = 0; i < arguments.Count; i++)
-                        {
-                            // Walk right from this argument to find the next significant token
-                            var sibling = arguments[i].NextSibling;
-                            while (sibling != null && sibling is IWhitespaceNode)
-                                sibling = sibling.NextSibling;
-                            if (sibling is ITokenNode nextToken && nextToken.GetTokenType() == CSharpTokenType.COMMA)
-                            {
-                                argIndex = i;
-                                break;
-                            }
-                        }
-
-                        ITreeNode n = ctx.Parent;
-                        while (n != null)
-                        {
-                            if (n is IDeclarationStatement)
-                            {
-                                var blockOffset = GetContainingBlockOffset(n);
-                                if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$ArgComma{argIndex}$Block{blockOffset}", QuirkyPriority);
-                            }
-
-                            n = n.Parent;
-                        }
-
-                        return null;
-                    }
-                )
-            )
-            .Build();
-    }
+        => BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition.SpaceBeforeComma);
 
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma()
+        => BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition.SpaceAfterComma);
+
+    private void BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition position)
     {
-        // SpaceAfterComma variant: aligns the space AFTER the comma, so the comma sits right
-        // after the argument and the next argument is aligned in a column.
+        var isSpaceBefore = position == AlignCommaPosition.SpaceBeforeComma;
+        var nameSuffix = isSpaceBefore ? "" : "_SpaceAfter";
+        var keyPrefix = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
+
+        var leftCondition = isSpaceBefore
+            ? Left().Satisfies((node, _) => node is ICSharpArgument)
+            : Left().HasType(CSharpTokenType.COMMA);
+
+        var rightCondition = isSpaceBefore
+            ? Right().HasType(CSharpTokenType.COMMA)
+            : Right().Satisfies((node, _) => node is ICSharpArgument);
+
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + "_SpaceAfter")
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + nameSuffix)
             .Where(
-                Left().HasType(CSharpTokenType.COMMA),
-                Right().Satisfies((node, _) => node is ICSharpArgument),
+                leftCondition,
+                rightCondition,
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
-                When(AlignCommaPosition.SpaceAfterComma).Calculate((formattingRangeContext, _) =>
+                When(position).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
@@ -136,10 +91,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         var argIndex = 0;
                         for (var i = 0; i < arguments.Count; i++)
                         {
-                            var sibling = arguments[i].PrevSibling;
+                            var sibling = isSpaceBefore ? arguments[i].NextSibling : arguments[i].PrevSibling;
                             while (sibling != null && sibling is IWhitespaceNode)
-                                sibling = sibling.PrevSibling;
-                            if (sibling is ITokenNode prevToken && prevToken.GetTokenType() == CSharpTokenType.COMMA)
+                                sibling = isSpaceBefore ? sibling.NextSibling : sibling.PrevSibling;
+                            if (sibling is ITokenNode token && token.GetTokenType() == CSharpTokenType.COMMA)
                             {
                                 argIndex = i;
                                 break;
@@ -153,7 +108,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                             {
                                 var blockOffset = GetContainingBlockOffset(n);
                                 if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$ArgAfterComma{argIndex}$Block{blockOffset}", QuirkyPriority);
+                                return new IntAlignOptionValue($"Params${keyPrefix}{argIndex}$Block{blockOffset}", QuirkyPriority);
                             }
 
                             n = n.Parent;
