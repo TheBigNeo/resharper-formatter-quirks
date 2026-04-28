@@ -45,12 +45,12 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // ...
 
         INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR();
+        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR_SPACE_AFTER();
         INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION();
         AddALIGN_PARAMETERS_LPARENTH();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
     }
-
 
     private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR()
     {
@@ -68,7 +68,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
-                When(true).Calculate((formattingRangeContext, _) =>
+                When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
@@ -113,6 +113,59 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Build();
     }
 
+    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR_SPACE_AFTER()
+    {
+        // SpaceAfterComma variant: aligns the space AFTER the comma, so the comma sits right
+        // after the argument and the next argument is aligned in a column.
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR) + "_SpaceAfter")
+            .Where(
+                Left().HasType(CSharpTokenType.COMMA),
+                Right().Satisfies((node, _) => node is ICSharpArgument),
+                Parent().Satisfies((node, _) => node is IArgumentList)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+                When(AlignCommaPosition.SpaceAfterComma).Calculate((formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+
+                        if (ctx.Parent is not IArgumentList argList) return null;
+                        var arguments = argList.Arguments;
+                        var argIndex = 0;
+                        for (var i = 0; i < arguments.Count; i++)
+                        {
+                            var sibling = arguments[i].PrevSibling;
+                            while (sibling != null && sibling is IWhitespaceNode)
+                                sibling = sibling.PrevSibling;
+                            if (sibling is ITokenNode prevToken && prevToken.GetTokenType() == CSharpTokenType.COMMA)
+                            {
+                                argIndex = i;
+                                break;
+                            }
+                        }
+
+                        ITreeNode n = ctx.Parent;
+                        while (n != null)
+                        {
+                            if (n is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$ArgAfterComma{argIndex}$Block{blockOffset}", QuirkyPriority);
+                            }
+
+                            n = n.Parent;
+                        }
+
+                        return null;
+                    }
+                )
+            )
+            .Build();
+    }
+
     private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION()
     {
         // Same rule for function/method call expressions (IExpressionStatement parent instead of IDeclarationStatement).
@@ -126,7 +179,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
-                When(true).Calculate((formattingRangeContext, _) =>
+                When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
@@ -172,6 +225,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             )
             .Build();
     }
+
 
     private void AddALIGN_PARAMETERS_LPARENTH()
     {

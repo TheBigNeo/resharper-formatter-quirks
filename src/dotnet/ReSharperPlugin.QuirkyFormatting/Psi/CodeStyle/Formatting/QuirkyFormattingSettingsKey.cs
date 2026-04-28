@@ -8,8 +8,8 @@ namespace JetBrains.ReSharper.Plugins.QuirkyFormatting.Psi.CodeStyle.Formatting;
 [SettingsKey(typeof(CodeFormattingSettingsKey), "Quirky formatter settings")]
 public class QuirkyFormattingSettingsKey
 {
-    [SettingsEntry(false, "Align argument commas by position across sibling declarations")]
-    public bool INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR;
+    [SettingsEntry(AlignCommaPosition.DoNotChange, "Align argument commas by position across sibling declarations")]
+    public AlignCommaPosition INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR;
 
     [SettingsEntry(false, "Align argument commas by position across sibling declarations")]
     public bool INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION;
