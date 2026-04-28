@@ -77,10 +77,24 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
   [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES), true)]
   //
   [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),             true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceAfterComma)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),    AlignCommaPosition.SpaceAfterComma)]
   [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE),       true)]
   [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),           true)]
-  public void TestCombined()
+  public void TestCombined_SpaceAfterComma()
+  {
+    DoNamedTest2();
+  }
+
+  [Test]
+  [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES), true)]
+  //
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),             true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),    AlignCommaPosition.SpaceBeforeComma)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE),       true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),           true)]
+  public void TestCombined_SpaceBeforeComma()
   {
     DoNamedTest2();
   }

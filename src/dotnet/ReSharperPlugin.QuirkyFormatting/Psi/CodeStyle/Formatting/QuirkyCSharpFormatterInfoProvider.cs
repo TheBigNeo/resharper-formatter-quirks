@@ -57,22 +57,22 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma()
         => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
-            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
-            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
+            SettingName: nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
+            ExternalKey: x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
             ParentPredicate: node => node is IArgumentList { Parent: IObjectCreationExpression },
-            StatementType:   typeof(IDeclarationStatement),
-            AlignKeyGroup:   "Params",
-            Position:        AlignCommaPosition.SpaceBeforeComma
+            StatementType: typeof(IDeclarationStatement),
+            AlignKeyGroup: "Params",
+            Position: AlignCommaPosition.SpaceBeforeComma
         ));
 
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma()
         => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
-            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
-            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
+            SettingName: nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
+            ExternalKey: x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
             ParentPredicate: node => node is IArgumentList { Parent: IObjectCreationExpression },
-            StatementType:   typeof(IDeclarationStatement),
-            AlignKeyGroup:   "Params",
-            Position:        AlignCommaPosition.SpaceAfterComma
+            StatementType: typeof(IDeclarationStatement),
+            AlignKeyGroup: "Params",
+            Position: AlignCommaPosition.SpaceAfterComma
         ));
 
     // ── Function call argument alignment ────────────────────────────────────────
@@ -89,12 +89,12 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceAfterComma()
         => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
-            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
-            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
+            SettingName: nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
+            ExternalKey: x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
             ParentPredicate: node => node is IArgumentList { Parent: IInvocationExpression },
-            StatementType:   typeof(IExpressionStatement),
-            AlignKeyGroup:   "Func",
-            Position:        AlignCommaPosition.SpaceAfterComma
+            StatementType: typeof(IExpressionStatement),
+            AlignKeyGroup: "Func",
+            Position: AlignCommaPosition.SpaceAfterComma
         ));
 
     // ── Shared builder ───────────────────────────────────────────────────────────
@@ -112,8 +112,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
     private void BuildIntAlignArgumentsRule(ArgumentAlignVariant variant)
     {
         var isSpaceBefore = variant.Position == AlignCommaPosition.SpaceBeforeComma;
-        var nameSuffix    = isSpaceBefore ? "_SpaceBefore" : "_SpaceAfter";
-        var commaKeyPart  = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
+        var nameSuffix = isSpaceBefore ? "_SpaceBefore" : "_SpaceAfter";
+        var commaKeyPart = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
 
         var leftCondition = isSpaceBefore
             ? Left().Satisfies((node, _) => node is ICSharpArgument)
@@ -134,10 +134,17 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 variant.ExternalKey,
                 When(variant.Position).Calculate((formattingRangeContext, _) =>
                     {
-                        if (formattingRangeContext is null) return null;
+                        if (formattingRangeContext is null)
+                        {
+                            return null;
+                        }
+
                         var ctx = (FormattingRangeContext)formattingRangeContext;
 
-                        if (ctx.Parent is not IArgumentList argList) return null;
+                        if (ctx.Parent is not IArgumentList argList)
+                        {
+                            return null;
+                        }
 
                         // Find the index of the argument adjacent to a comma
                         var argIndex = 0;
@@ -145,8 +152,12 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         for (var i = 0; i < arguments.Count; i++)
                         {
                             var sibling = isSpaceBefore ? arguments[i].NextSibling : arguments[i].PrevSibling;
+
                             while (sibling is IWhitespaceNode)
+                            {
                                 sibling = isSpaceBefore ? sibling.NextSibling : sibling.PrevSibling;
+                            }
+
                             if (sibling is ITokenNode token && token.GetTokenType() == CSharpTokenType.COMMA)
                             {
                                 argIndex = i;
@@ -160,7 +171,12 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                             if (!variant.StatementType.IsInstanceOfType(n)) continue;
 
                             var blockOffset = GetContainingBlockOffset(n);
-                            if (blockOffset == null) return null;
+
+                            if (blockOffset == null)
+                            {
+                                return null;
+                            }
+
                             return new IntAlignOptionValue(
                                 $"{variant.AlignKeyGroup}${commaKeyPart}{argIndex}$Block{blockOffset}",
                                 QuirkyPriority
