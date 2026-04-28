@@ -52,48 +52,6 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
     }
 
 
-    private void AddALIGN_PARAMETERS_LPARENTH()
-    {
-        // ============================================
-        // ======= Align Different Method Names at (
-        // ============================================
-        // Column 2: align '(' after type name in "new TypeName(" inside a local var declaration
-        // The left of '(' in 'new TypeName(' is ITypeUsage (the type reference), not IReferenceName
-        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name("ALIGN_PARAMETERS_LPARENTH")
-            .Where(
-                Left().Satisfies((node, _) => node is ITypeUsage)
-                    .Or().HasType(CSharpTokenType.NEW_KEYWORD),
-                Right().HasType(CSharpTokenType.LPARENTH),
-                Parent().Satisfies((node, _) => node is IObjectCreationExpression)
-            )
-            .SwitchOnExternalKey(
-                x => x.INT_ALIGN_NEW_LPARENTH,
-                When(true).Calculate((formattingRangeContext, _) =>
-                    {
-                        if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-                        // Walk up to find the var declaration statement
-                        ITreeNode n = ctx.Parent;
-                        while (n != null)
-                        {
-                            if (n is IDeclarationStatement)
-                            {
-                                var blockOffset = GetContainingBlockOffset(n);
-                                if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params$LParen$Block{blockOffset}", QuirkyPriority);
-                            }
-
-                            n = n.Parent;
-                        }
-
-                        return null;
-                    }
-                )
-            )
-            .Build();
-    }
-
     private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR()
     {
         // Column 3: align ',' after each argument at position N — one rule for all indices.
@@ -203,6 +161,48 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                     methodName = invocation.InvokedExpression.GetText();
 
                                 return new IntAlignOptionValue($"Func$ArgComma{argIndex}${methodName}$Block{blockOffset}", QuirkyPriority);
+                            }
+
+                            n = n.Parent;
+                        }
+
+                        return null;
+                    }
+                )
+            )
+            .Build();
+    }
+
+    private void AddALIGN_PARAMETERS_LPARENTH()
+    {
+        // ============================================
+        // ======= Align Different Method Names at (
+        // ============================================
+        // Column 2: align '(' after type name in "new TypeName(" inside a local var declaration
+        // The left of '(' in 'new TypeName(' is ITypeUsage (the type reference), not IReferenceName
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name("ALIGN_PARAMETERS_LPARENTH")
+            .Where(
+                Left().Satisfies((node, _) => node is ITypeUsage)
+                    .Or().HasType(CSharpTokenType.NEW_KEYWORD),
+                Right().HasType(CSharpTokenType.LPARENTH),
+                Parent().Satisfies((node, _) => node is IObjectCreationExpression)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_NEW_LPARENTH,
+                When(true).Calculate((formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        // Walk up to find the var declaration statement
+                        ITreeNode n = ctx.Parent;
+                        while (n != null)
+                        {
+                            if (n is IDeclarationStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n);
+                                if (blockOffset == null) return null;
+                                return new IntAlignOptionValue($"Params$LParen$Block{blockOffset}", QuirkyPriority);
                             }
 
                             n = n.Parent;
