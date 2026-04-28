@@ -34,13 +34,13 @@ internal class AlignCommaAfterArgumentInConstructor
 
   static void CallFunctions()
   {
-    Caller.F1("T-Rex",      "Raptor",        "Moros",         "Triceratops");
-    Caller.F1("Ankylo",     "Tyrannosaurus", "Indominus rex", "Brachio");
-    Caller.F1("Gallimimus", "Indor",         "Carno",         "Spino");
-    Caller.F1("Veloci",     "Baryo",         "Moso",          "Dilophosaurus");
-    Caller.F1("T-Rex",      "Raptor",        "Moros",         "Triceratops");
-    Caller.F2("Ankylo",     "Tyrannosaurus", "Indominus rex", "Brachio");
-    Caller.F3("Gallimimus", "Indor",         "Carno",         "Spino");
-    Caller.F4("Veloci",     "Baryo",         "Moso",          "Dilophosaurus");
+    Caller.F1("T-Rex",  "Raptor",        "Moros",         "Triceratops");
+    Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F2("Gallimimus", "Indor", "Carno", "Spino");
+    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus");
+    Caller.F3("T-Rex", "Raptor", "Moros", "Triceratops");
+    Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F4("Gallimimus", "Indor", "Carno", "Spino");
+    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus");
   }
 }

@@ -45,6 +45,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // ...
 
         INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR();
+        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION();
         AddALIGN_PARAMETERS_LPARENTH();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
@@ -142,6 +143,66 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                                 var blockOffset = GetContainingBlockOffset(n);
                                 if (blockOffset == null) return null;
                                 return new IntAlignOptionValue($"Params$ArgComma{argIndex}$Block{blockOffset}", QuirkyPriority);
+                            }
+
+                            n = n.Parent;
+                        }
+
+                        return null;
+                    }
+                )
+            )
+            .Build();
+    }
+
+    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION()
+    {
+        // Same rule for function/method call expressions (IExpressionStatement parent instead of IDeclarationStatement).
+        // Groups by method name + arg index + containing block so that calls to the same method are aligned together.
+        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR) + "_Function")
+            .Where(
+                Left().Satisfies((node, _) => node is ICSharpArgument),
+                Right().HasType(CSharpTokenType.COMMA),
+                Parent().Satisfies((node, _) => node is IArgumentList)
+            )
+            .SwitchOnExternalKey(
+                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+                When(true).Calculate((formattingRangeContext, _) =>
+                    {
+                        if (formattingRangeContext == null) return null;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+
+                        if (ctx.Parent is not IArgumentList argList) return null;
+                        var arguments = argList.Arguments;
+                        var argIndex = 0;
+                        for (var i = 0; i < arguments.Count; i++)
+                        {
+                            var sibling = arguments[i].NextSibling;
+                            while (sibling != null && sibling is IWhitespaceNode)
+                                sibling = sibling.NextSibling;
+                            if (sibling is ITokenNode nextToken && nextToken.GetTokenType() == CSharpTokenType.COMMA)
+                            {
+                                argIndex = i;
+                                break;
+                            }
+                        }
+
+                        ITreeNode n = ctx.Parent;
+                        while (n != null)
+                        {
+                            if (n is IExpressionStatement)
+                            {
+                                var blockOffset = GetContainingBlockOffset(n);
+                                if (blockOffset == null) return null;
+
+                                // Derive a stable method-name key from the invocation so that only
+                                // calls to the same method are grouped into the same alignment column.
+                                var methodName = "";
+                                if (argList.Parent is IInvocationExpression invocation)
+                                    methodName = invocation.InvokedExpression.GetText();
+
+                                return new IntAlignOptionValue($"Func$ArgComma{argIndex}${methodName}$Block{blockOffset}", QuirkyPriority);
                             }
 
                             n = n.Parent;
