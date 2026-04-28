@@ -44,27 +44,15 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // IntAlignRule    -> To describe some kind of column-based formatting
         // ...
 
-        QuirkyAlignParameters();
+        AddALIGN_PARAMETERS_LPARENTH();
+        AddALIGN_PARAMETERS_ARG_COMMA();
+        AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
+        AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
     }
 
 
-    private void QuirkyAlignParameters()
+    private void AddALIGN_PARAMETERS_LPARENTH()
     {
-        // Helper to get the containing block offset for grouping alignment columns across var declarations
-        static long? GetContainingBlockOffset(ITreeNode node)
-        {
-            var n = node;
-            while (n != null)
-            {
-                if (n is IBlock block)
-                    return block.GetDocumentStartOffset().Offset;
-                n = n.Parent;
-            }
-
-            return null;
-        }
-
-
         // ============================================
         // ======= Align Different Method Names at (
         // ============================================
@@ -102,7 +90,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 )
             )
             .Build();
+    }
 
+    private void AddALIGN_PARAMETERS_ARG_COMMA()
+    {
         // Column 3: align ',' after each argument at position N — one rule for all indices.
         // The group key encodes both the argument position and the containing block, so commas
         // at the same position across sibling var-declarations are aligned as a column.
@@ -128,7 +119,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         // sibling token is a COMMA — the first match gives us the arg index.
                         if (ctx.Parent is not IArgumentList argList) return null;
                         var arguments = argList.Arguments;
-                        var argIndex  = 0;
+                        var argIndex = 0;
                         for (var i = 0; i < arguments.Count; i++)
                         {
                             // Walk right from this argument to find the next significant token
@@ -160,7 +151,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 )
             )
             .Build();
+    }
 
+    private void AddALIGN_PARAMETERS_INITIALIZER_LBRACE()
+    {
         // Column 4: align the object initializer '{...}' node after the closing ')' of constructor args
         // The Right() is IObjectInitializer (composite), not the '{' token directly
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
@@ -175,8 +169,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
-                        var       ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n4  = ctx.Parent;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n4 = ctx.Parent;
                         while (n4 != null)
                         {
                             if (n4 is IDeclarationStatement)
@@ -194,7 +188,11 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 )
             )
             .Build();
+    }
 
+    private void AddALIGN_PARAMETERS_MEMBER_INIT_EQ()
+    {
+        // Align left hand side from = in object initializer
         // Column 5: align '=' (Operator) in object initializer member assignments
         // Parent is IMemberInitializer; Left() is the identifier token, Right() is the EQ token
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
@@ -209,8 +207,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
-                        var       ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n5  = ctx.Parent;
+                        var ctx = (FormattingRangeContext)formattingRangeContext;
+                        ITreeNode n5 = ctx.Parent;
                         while (n5 != null)
                         {
                             if (n5 is IDeclarationStatement)
@@ -230,12 +228,28 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Build();
     }
 
+    private static long? GetContainingBlockOffset(ITreeNode node)
+    {
+        var n = node;
+        while (n != null)
+        {
+            if (n is IBlock block)
+                return block.GetDocumentStartOffset().Offset;
+            n = n.Parent;
+        }
+
+        return null;
+    }
+
+
     public override IEnumerable<IScalarSetting<bool>> PureIntAlignSettings()
     {
         // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ATTRIBUTE_COMMAS);
-        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_NEW_LPARENTH);
-        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ARG_COMMA);
-        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_INITIALIZER_LBRACE);
-        yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_MEMBER_INIT_EQ);
+        // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_NEW_LPARENTH);
+        // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ARG_COMMA);
+        // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_INITIALIZER_LBRACE);
+        // yield return CalculatedSettingsSchema.GetScalarSetting((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_MEMBER_INIT_EQ);
+
+        yield break;
     }
 }

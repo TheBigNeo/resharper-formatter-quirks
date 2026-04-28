@@ -1,6 +1,6 @@
 using ReSharperPlugin.QuirkyFormatting.Tests.test.data;
 
-public class AlignMemberInitEq
+public class Combined
 {
   static void DefinedType()
   {

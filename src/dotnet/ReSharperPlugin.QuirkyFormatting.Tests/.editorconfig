@@ -1,0 +1,5 @@
+[*.cs]
+indent_style = space
+indent_size = 2
+int_align_variables = true
+int_align_invocations = true
