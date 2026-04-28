@@ -32,8 +32,8 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
   }
 
   [Test]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARG_COMMA), true)]
-  public void TestAlignArgComma()
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR), true)]
+  public void TestAlignCommaAfterArgumentInConstructor()
   {
     DoNamedTest2();
   }
@@ -55,10 +55,10 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
   [Test]
   [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES),   true)]
   //
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),       true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARG_COMMA),          true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE), true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),     true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),         true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR), true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE),   true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),       true)]
   public void TestCombined()
   {
     DoNamedTest2();

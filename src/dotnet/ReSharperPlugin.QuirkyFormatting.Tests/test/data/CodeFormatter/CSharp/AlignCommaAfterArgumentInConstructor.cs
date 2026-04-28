@@ -1,6 +1,8 @@
+using JetBrains.ReSharper.Plugins.QuirkyFormatting.Psi.CodeStyle.Formatting;
 using ReSharperPlugin.QuirkyFormatting.Tests.test.data;
 
-public class AlignArgComma
+/// <seealso cref="QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR"/>
+internal class AlignCommaAfterArgumentInConstructor
 {
   static void DefinedType()
   {
@@ -28,5 +30,17 @@ public class AlignArgComma
     UShortSetting webSocketPort = new("c89bc913-", "WebSocket Port", ++settingsSortIndex, true, 4444);
     StringSetting shutdownActions = new("9acd45ec-e8b9-45ad-b136-ecdeecd87074", "Shutdown Actions", ++settingsSortIndex, false, HtmlFieldType.Text, null);
     StringSetting startupActions = new("caf5ff1a5983", "Startup Actions", ++settingsSortIndex, false, HtmlFieldType.Text, null);
+  }
+
+  static void CallFunctions()
+  {
+    Caller.F1("T-Rex",      "Raptor",        "Moros",         "Triceratops");
+    Caller.F1("Ankylo",     "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F1("Gallimimus", "Indor",         "Carno",         "Spino");
+    Caller.F1("Veloci",     "Baryo",         "Moso",          "Dilophosaurus");
+    Caller.F1("T-Rex",      "Raptor",        "Moros",         "Triceratops");
+    Caller.F2("Ankylo",     "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F3("Gallimimus", "Indor",         "Carno",         "Spino");
+    Caller.F4("Veloci",     "Baryo",         "Moso",          "Dilophosaurus");
   }
 }

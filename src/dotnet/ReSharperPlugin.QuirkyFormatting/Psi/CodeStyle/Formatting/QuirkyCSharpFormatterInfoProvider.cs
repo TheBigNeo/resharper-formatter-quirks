@@ -44,8 +44,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // IntAlignRule    -> To describe some kind of column-based formatting
         // ...
 
+        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR();
         AddALIGN_PARAMETERS_LPARENTH();
-        AddALIGN_PARAMETERS_ARG_COMMA();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
     }
@@ -93,7 +93,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Build();
     }
 
-    private void AddALIGN_PARAMETERS_ARG_COMMA()
+    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR()
     {
         // Column 3: align ',' after each argument at position N — one rule for all indices.
         // The group key encodes both the argument position and the containing block, so commas
@@ -101,14 +101,14 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // The argument index is determined by counting COMMA tokens in the IArgumentList that
         // precede the Right() COMMA token — i.e. commaIndex == argIndex of the left argument.
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name("ALIGN_PARAMETERS_ARG_COMMA")
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR))
             .Where(
                 Left().Satisfies((node, _) => node is ICSharpArgument),
                 Right().HasType(CSharpTokenType.COMMA),
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_ARG_COMMA,
+                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
                 When(true).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
