@@ -44,15 +44,15 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // IntAlignRule    -> To describe some kind of column-based formatting
         // ...
 
-        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR();
-        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR_SPACE_AFTER();
+        INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma();
+        INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma();
         INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION();
         AddALIGN_PARAMETERS_LPARENTH();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
     }
 
-    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR()
+    private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma()
     {
         // Column 3: align ',' after each argument at position N — one rule for all indices.
         // The group key encodes both the argument position and the containing block, so commas
@@ -60,14 +60,14 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // The argument index is determined by counting COMMA tokens in the IArgumentList that
         // precede the Right() COMMA token — i.e. commaIndex == argIndex of the left argument.
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR))
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR))
             .Where(
                 Left().Satisfies((node, _) => node is ICSharpArgument),
                 Right().HasType(CSharpTokenType.COMMA),
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
                 When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -113,19 +113,19 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Build();
     }
 
-    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR_SPACE_AFTER()
+    private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma()
     {
         // SpaceAfterComma variant: aligns the space AFTER the comma, so the comma sits right
         // after the argument and the next argument is aligned in a column.
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR) + "_SpaceAfter")
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + "_SpaceAfter")
             .Where(
                 Left().HasType(CSharpTokenType.COMMA),
                 Right().Satisfies((node, _) => node is ICSharpArgument),
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
                 When(AlignCommaPosition.SpaceAfterComma).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;
@@ -171,14 +171,14 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         // Same rule for function/method call expressions (IExpressionStatement parent instead of IDeclarationStatement).
         // Groups by method name + arg index + containing block so that calls to the same method are aligned together.
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR) + "_Function")
+            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + "_Function")
             .Where(
                 Left().Satisfies((node, _) => node is ICSharpArgument),
                 Right().HasType(CSharpTokenType.COMMA),
                 Parent().Satisfies((node, _) => node is IArgumentList)
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
                 When(AlignCommaPosition.SpaceBeforeComma).Calculate((formattingRangeContext, _) =>
                     {
                         if (formattingRangeContext == null) return null;

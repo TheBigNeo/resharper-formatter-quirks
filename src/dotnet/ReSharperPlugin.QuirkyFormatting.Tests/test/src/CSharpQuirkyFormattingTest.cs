@@ -32,15 +32,15 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
   }
 
   [Test]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
-  public void TestAlignCommaAfterArgumentInConstructor()
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
+  public void TestAlignArgumentsInConstructor_SpaceBeforeComma()
   {
     DoNamedTest2();
   }
 
   [Test]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR), AlignCommaPosition.SpaceAfterComma)]
-  public void TestAlignCommaAfterArgumentInConstructorSpaceAfterComma()
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceAfterComma)]
+  public void TestAlignArgumentsInConstructor_SpaceAfterComma()
   {
     DoNamedTest2();
   }
@@ -60,12 +60,12 @@ public class CSharpQuirkyFormattingTest : CodeFormatterWithExplicitSettingsTestB
   }
 
   [Test]
-  [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES),   true)]
+  [TestSetting(typeof(CSharpFormatSettingsKey), nameof(CSharpFormatSettingsKey.INT_ALIGN_VARIABLES), true)]
   //
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),         true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE),   true)]
-  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),       true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_NEW_LPARENTH),             true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR), AlignCommaPosition.SpaceBeforeComma)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_INITIALIZER_LBRACE),       true)]
+  [TestSetting(typeof(QuirkyFormattingSettingsKey), nameof(QuirkyFormattingSettingsKey.INT_ALIGN_MEMBER_INIT_EQ),           true)]
   public void TestCombined()
   {
     DoNamedTest2();

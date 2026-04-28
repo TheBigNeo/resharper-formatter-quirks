@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.QuirkyFormatting.Psi.CodeStyle.Formatting;
 public class QuirkyFormattingSettingsKey
 {
     [SettingsEntry(AlignCommaPosition.DoNotChange, "Align argument commas by position across sibling declarations")]
-    public AlignCommaPosition INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR;
+    public AlignCommaPosition INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR;
 
     [SettingsEntry(false, "Align argument commas by position across sibling declarations")]
     public bool INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION;

@@ -39,7 +39,7 @@ public class QuirkyFormattingSettingsSchema : OthersPageSchemaPart
       //   "[Attr(\r\nLittleString=\"smol\",\r\nLongString=\"This is some very long string literal\",\r\nLittleString1=\"smolagain\"\r\n)]\r\npublic static void Main(){}")
       .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_NEW_LPARENTH,
         "public static void Main(){var ShortName = new A(\"x\"); var LongerName = new LongerType(\"x\");}")
-      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_CONSTRUCTOR,
+      .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
         "public static void Main(){var ShortName = new A(\"x\", \"Short\", 1); var LongerName = new LongerType(\"x\", \"Longer name\", 2);}")
       .ItemFor((QuirkyFormattingSettingsKey x) => x.INT_ALIGN_INITIALIZER_LBRACE,
         "public static void Main(){var ShortName = new A(\"x\") { P = 1 }; var LongerName = new LongerType(\"x\") { P = 2 };}")
