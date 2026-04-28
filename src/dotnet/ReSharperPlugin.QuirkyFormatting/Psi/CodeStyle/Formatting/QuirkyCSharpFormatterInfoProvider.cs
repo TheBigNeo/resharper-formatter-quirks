@@ -46,7 +46,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
         INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma();
         INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma();
-        INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION();
+        INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma();
         AddALIGN_PARAMETERS_LPARENTH();
         AddALIGN_PARAMETERS_INITIALIZER_LBRACE();
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
@@ -121,7 +121,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Build();
     }
 
-    private void INT_ALIGN_COMMA_AFTER_ARGUMENT_IN_FUNCTION()
+    private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma()
     {
         // Same rule for function/method call expressions (IExpressionStatement parent instead of IDeclarationStatement).
         // Groups by method name + arg index + containing block so that calls to the same method are aligned together.
