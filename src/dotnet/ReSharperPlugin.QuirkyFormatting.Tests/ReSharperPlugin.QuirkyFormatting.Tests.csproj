@@ -18,8 +18,13 @@
 
   <ItemGroup>
     <Compile Remove="test/**/*" />
-    <Compile Include="test\data\CodeFormatter\CSharp\*.cs" />
     <Compile Include="test\data\MyData.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\AlignInitializerLBrace.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\AlignMemberInitEq.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\AlignNewLParenth.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\AlignParameters.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\AlignParameters2.cs" />
+    <Compile Include="test\data\CodeFormatter\CSharp\MyReference.cs" />
     <Compile Include="test\src\CSharpQuirkyFormattingTest.cs" />
     <None Include="test/**/*" />
   </ItemGroup>
