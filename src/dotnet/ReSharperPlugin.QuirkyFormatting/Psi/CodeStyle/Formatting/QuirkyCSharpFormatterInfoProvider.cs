@@ -61,7 +61,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
             .Name("ALIGN_PARAMETERS_LPARENTH")
             .Where(
-                Left().Satisfies((node, _) => node is ITypeUsage),
+                Left().Satisfies((node, _) => node is ITypeUsage)
+                    .Or().HasType(CSharpTokenType.NEW_KEYWORD),
                 Right().HasType(CSharpTokenType.LPARENTH),
                 Parent().Satisfies((node, _) => node is IObjectCreationExpression)
             )
