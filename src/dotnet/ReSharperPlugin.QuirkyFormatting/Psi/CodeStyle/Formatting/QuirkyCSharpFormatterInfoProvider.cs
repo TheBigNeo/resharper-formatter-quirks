@@ -53,115 +53,99 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         AddALIGN_PARAMETERS_MEMBER_INIT_EQ();
     }
 
+    // ── Constructor argument alignment ──────────────────────────────────────────
+
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceBeforeComma()
-        => BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition.SpaceBeforeComma);
+        => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
+            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
+            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
+            ParentPredicate: node => node is IArgumentList { Parent: IObjectCreationExpression },
+            StatementType:   typeof(IDeclarationStatement),
+            AlignKeyGroup:   "Params",
+            Position:        AlignCommaPosition.SpaceBeforeComma
+        ));
 
     private void INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR_SpaceAfterComma()
-        => BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition.SpaceAfterComma);
+        => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
+            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR),
+            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
+            ParentPredicate: node => node is IArgumentList { Parent: IObjectCreationExpression },
+            StatementType:   typeof(IDeclarationStatement),
+            AlignKeyGroup:   "Params",
+            Position:        AlignCommaPosition.SpaceAfterComma
+        ));
 
-    private void BuildIntAlignArgumentsInConstructorRule(AlignCommaPosition position)
-    {
-        var isSpaceBefore = position == AlignCommaPosition.SpaceBeforeComma;
-        var nameSuffix = isSpaceBefore ? "" : "_SpaceAfter";
-        var keyPrefix = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
-
-        var leftCondition = isSpaceBefore
-            ? Left().Satisfies((node, _) => node is ICSharpArgument)
-            : Left().HasType(CSharpTokenType.COMMA);
-
-        var rightCondition = isSpaceBefore
-            ? Right().HasType(CSharpTokenType.COMMA)
-            : Right().Satisfies((node, _) => node is ICSharpArgument);
-
-        DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR) + nameSuffix)
-            .Where(
-                leftCondition,
-                rightCondition,
-                Parent().Satisfies((node, _) => node is IArgumentList { Parent: IObjectCreationExpression })
-            )
-            .SwitchOnExternalKey(
-                x => x.INT_ALIGN_ARGUMENTS_IN_CONSTRUCTOR,
-                When(position).Calculate((formattingRangeContext, _) =>
-                    {
-                        if (formattingRangeContext == null) return null;
-                        var ctx = (FormattingRangeContext)formattingRangeContext;
-
-                        if (ctx.Parent is not IArgumentList argList) return null;
-                        var arguments = argList.Arguments;
-                        var argIndex = 0;
-                        for (var i = 0; i < arguments.Count; i++)
-                        {
-                            var sibling = isSpaceBefore ? arguments[i].NextSibling : arguments[i].PrevSibling;
-                            while (sibling != null && sibling is IWhitespaceNode)
-                                sibling = isSpaceBefore ? sibling.NextSibling : sibling.PrevSibling;
-                            if (sibling is ITokenNode token && token.GetTokenType() == CSharpTokenType.COMMA)
-                            {
-                                argIndex = i;
-                                break;
-                            }
-                        }
-
-                        ITreeNode n = ctx.Parent;
-                        while (n != null)
-                        {
-                            if (n is IDeclarationStatement)
-                            {
-                                var blockOffset = GetContainingBlockOffset(n);
-                                if (blockOffset == null) return null;
-                                return new IntAlignOptionValue($"Params${keyPrefix}{argIndex}$Block{blockOffset}", QuirkyPriority);
-                            }
-
-                            n = n.Parent;
-                        }
-
-                        return null;
-                    }
-                )
-            )
-            .Build();
-    }
+    // ── Function call argument alignment ────────────────────────────────────────
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma()
-        => BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition.SpaceBeforeComma);
+        => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
+            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
+            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
+            ParentPredicate: node => node is IArgumentList { Parent: IInvocationExpression },
+            StatementType:   typeof(IExpressionStatement),
+            AlignKeyGroup:   "Func",
+            Position:        AlignCommaPosition.SpaceBeforeComma
+        ));
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceAfterComma()
-        => BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition.SpaceAfterComma);
+        => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
+            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
+            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
+            ParentPredicate: node => node is IArgumentList { Parent: IInvocationExpression },
+            StatementType:   typeof(IExpressionStatement),
+            AlignKeyGroup:   "Func",
+            Position:        AlignCommaPosition.SpaceAfterComma
+        ));
 
-    private void BuildIntAlignArgumentsInFunctionRule(AlignCommaPosition position)
+    // ── Shared builder ───────────────────────────────────────────────────────────
+
+    /// <summary>Describes what makes each alignment variant unique; everything else is shared logic.</summary>
+    private record ArgumentAlignVariant(
+        string SettingName,
+        System.Linq.Expressions.Expression<System.Func<QuirkyFormattingSettingsKey, object>> ExternalKey,
+        System.Func<ITreeNode, bool> ParentPredicate,
+        System.Type StatementType,
+        string AlignKeyGroup,
+        AlignCommaPosition Position
+    );
+
+    private void BuildIntAlignArgumentsRule(ArgumentAlignVariant variant)
     {
-        var isSpaceBefore = position == AlignCommaPosition.SpaceBeforeComma;
-        var nameSuffix = isSpaceBefore ? "" : "_SpaceAfter";
-        var keyPrefix = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
+        var isSpaceBefore = variant.Position == AlignCommaPosition.SpaceBeforeComma;
+        var nameSuffix    = isSpaceBefore ? "_SpaceBefore" : "_SpaceAfter";
+        var commaKeyPart  = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
 
         var leftCondition = isSpaceBefore
             ? Left().Satisfies((node, _) => node is ICSharpArgument)
             : Left().HasType(CSharpTokenType.COMMA);
+
         var rightCondition = isSpaceBefore
             ? Right().HasType(CSharpTokenType.COMMA)
             : Right().Satisfies((node, _) => node is ICSharpArgument);
 
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
-            .Name(nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION) + nameSuffix)
+            .Name(variant.SettingName + nameSuffix)
             .Where(
                 leftCondition,
                 rightCondition,
-                Parent().Satisfies((node, _) => node is IArgumentList { Parent: IInvocationExpression })
+                Parent().Satisfies((node, _) => variant.ParentPredicate(node))
             )
             .SwitchOnExternalKey(
-                x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
-                When(position).Calculate((formattingRangeContext, _) =>
+                variant.ExternalKey,
+                When(variant.Position).Calculate((formattingRangeContext, _) =>
                     {
-                        if (formattingRangeContext == null) return null;
+                        if (formattingRangeContext is null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
 
                         if (ctx.Parent is not IArgumentList argList) return null;
-                        var arguments = argList.Arguments;
+
+                        // Find the index of the argument adjacent to a comma
                         var argIndex = 0;
+                        var arguments = argList.Arguments;
                         for (var i = 0; i < arguments.Count; i++)
                         {
                             var sibling = isSpaceBefore ? arguments[i].NextSibling : arguments[i].PrevSibling;
-                            while (sibling != null && sibling is IWhitespaceNode)
+                            while (sibling is IWhitespaceNode)
                                 sibling = isSpaceBefore ? sibling.NextSibling : sibling.PrevSibling;
                             if (sibling is ITokenNode token && token.GetTokenType() == CSharpTokenType.COMMA)
                             {
@@ -170,18 +154,17 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                             }
                         }
 
-                        ITreeNode n = ctx.Parent;
-                        while (n != null)
+                        // Walk up to find the enclosing statement and use its block offset as the alignment group
+                        for (ITreeNode n = ctx.Parent; n != null; n = n.Parent)
                         {
-                            if (n is IExpressionStatement)
-                            {
-                                var blockOffset = GetContainingBlockOffset(n);
-                                if (blockOffset == null) return null;
+                            if (!variant.StatementType.IsInstanceOfType(n)) continue;
 
-                                return new IntAlignOptionValue($"Func${keyPrefix}{argIndex}$Block{blockOffset}", QuirkyPriority);
-                            }
-
-                            n = n.Parent;
+                            var blockOffset = GetContainingBlockOffset(n);
+                            if (blockOffset == null) return null;
+                            return new IntAlignOptionValue(
+                                $"{variant.AlignKeyGroup}${commaKeyPart}{argIndex}$Block{blockOffset}",
+                                QuirkyPriority
+                            );
                         }
 
                         return null;
