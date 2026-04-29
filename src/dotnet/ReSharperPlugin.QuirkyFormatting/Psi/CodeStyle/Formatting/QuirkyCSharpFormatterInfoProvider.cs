@@ -79,12 +79,12 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceBeforeComma()
         => BuildIntAlignArgumentsRule(new ArgumentAlignVariant(
-            SettingName:     nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
-            ExternalKey:     x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
+            SettingName: nameof(QuirkyFormattingSettingsKey.INT_ALIGN_ARGUMENTS_IN_FUNCTION),
+            ExternalKey: x => x.INT_ALIGN_ARGUMENTS_IN_FUNCTION,
             ParentPredicate: node => node is IArgumentList { Parent: IInvocationExpression },
-            StatementType:   typeof(IExpressionStatement),
-            AlignKeyGroup:   "Func",
-            Position:        AlignCommaPosition.SpaceBeforeComma
+            StatementType: typeof(IExpressionStatement),
+            AlignKeyGroup: "Func",
+            Position: AlignCommaPosition.SpaceBeforeComma
         ));
 
     private void INT_ALIGN_ARGUMENTS_IN_FUNCTION_SpaceAfterComma()
@@ -98,6 +98,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         ));
 
     // ── Shared builder ───────────────────────────────────────────────────────────
+
 
     /// <summary>Describes what makes each alignment variant unique; everything else is shared logic.</summary>
     private record ArgumentAlignVariant(
@@ -116,19 +117,19 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         var commaKeyPart = isSpaceBefore ? "ArgComma" : "ArgAfterComma";
 
         var leftCondition = isSpaceBefore
-            ? Left().Satisfies((node, _) => node is ICSharpArgument)
+            ? Left().Satisfies((node, _) => node.NodeOrNull is ICSharpArgument)
             : Left().HasType(CSharpTokenType.COMMA);
 
         var rightCondition = isSpaceBefore
             ? Right().HasType(CSharpTokenType.COMMA)
-            : Right().Satisfies((node, _) => node is ICSharpArgument);
+            : Right().Satisfies((node, _) => node.NodeOrNull is ICSharpArgument);
 
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
             .Name(variant.SettingName + nameSuffix)
             .Where(
                 leftCondition,
                 rightCondition,
-                Parent().Satisfies((node, _) => variant.ParentPredicate(node))
+                Parent().Satisfies((node, _) => variant.ParentPredicate(node.NodeOrNull))
             )
             .SwitchOnExternalKey(
                 variant.ExternalKey,
@@ -141,7 +142,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
 
                         var ctx = (FormattingRangeContext)formattingRangeContext;
 
-                        if (ctx.Parent is not IArgumentList argList)
+                        if (ctx.Parent.NodeOrNull is not IArgumentList argList)
                         {
                             return null;
                         }
@@ -166,7 +167,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         }
 
                         // Walk up to find the enclosing statement and use its block offset as the alignment group
-                        for (ITreeNode n = ctx.Parent; n != null; n = n.Parent)
+                        for (ITreeNode n = ctx.Parent.NodeOrNull; n != null; n = n.Parent)
                         {
                             if (!variant.StatementType.IsInstanceOfType(n)) continue;
 
@@ -201,10 +202,10 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
             .Name("ALIGN_PARAMETERS_LPARENTH")
             .Where(
-                Left().Satisfies((node, _) => node is ITypeUsage)
+                Left().Satisfies((node, _) => node.NodeOrNull is ITypeUsage)
                     .Or().HasType(CSharpTokenType.NEW_KEYWORD),
                 Right().HasType(CSharpTokenType.LPARENTH),
-                Parent().Satisfies((node, _) => node is IObjectCreationExpression)
+                Parent().Satisfies((node, _) => node.NodeOrNull is IObjectCreationExpression)
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_NEW_LPARENTH,
@@ -213,7 +214,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
                         // Walk up to find the var declaration statement
-                        ITreeNode n = ctx.Parent;
+                        ITreeNode n = ctx.Parent.NodeOrNull;
                         while (n != null)
                         {
                             if (n is IDeclarationStatement)
@@ -241,8 +242,8 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Name("ALIGN_PARAMETERS_INITIALIZER_LBRACE")
             .Where(
                 Left().HasType(CSharpTokenType.RPARENTH),
-                Right().Satisfies((node, _) => node is IObjectInitializer),
-                Parent().Satisfies((node, _) => node is IObjectCreationExpression)
+                Right().Satisfies((node, _) => node.NodeOrNull is IObjectInitializer),
+                Parent().Satisfies((node, _) => node.NodeOrNull is IObjectCreationExpression)
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_INITIALIZER_LBRACE,
@@ -250,7 +251,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n4 = ctx.Parent;
+                        ITreeNode n4 = ctx.Parent.NodeOrNull;
                         while (n4 != null)
                         {
                             if (n4 is IDeclarationStatement)
@@ -278,9 +279,9 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
             .Name("ALIGN_PARAMETERS_MEMBER_INIT_EQ")
             .Where(
-                Left().Satisfies((node, _) => node is ITokenNode t && t.Parent is IMemberInitializer),
+                Left().Satisfies((node, _) => node.NodeOrNull is ITokenNode t && t.Parent is IMemberInitializer),
                 Right().HasType(CSharpTokenType.EQ),
-                Parent().Satisfies((node, _) => node is IMemberInitializer)
+                Parent().Satisfies((node, _) => node.NodeOrNull is IMemberInitializer)
             )
             .SwitchOnExternalKey(
                 x => x.INT_ALIGN_MEMBER_INIT_EQ,
@@ -288,7 +289,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                     {
                         if (formattingRangeContext == null) return null;
                         var ctx = (FormattingRangeContext)formattingRangeContext;
-                        ITreeNode n5 = ctx.Parent;
+                        ITreeNode n5 = ctx.Parent.NodeOrNull;
                         while (n5 != null)
                         {
                             if (n5 is IDeclarationStatement)

@@ -32,13 +32,13 @@ public class Combined_SpaceAfterComma
 
   static void CallFunctions()
   {
-    Caller.F1("T-Rex",  "Raptor",        "Moros",         "Triceratops");
+    Caller.F1("T-Rex",  "Raptor",        "Moros",         "Triceratops", "Parasaurolophus");
     Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
-    Caller.F2("Gallimimus", "Indor", "Carno", "Spino");
-    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus");
-    Caller.F3("T-Rex", "Raptor", "Moros", "Triceratops");
+    Caller.F2("Gallimimus", "Indor", "Carno", "Spinosaurus");
+    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus", "Iguanodon", "Oviraptor");
+    Caller.F3("T-Rex", "Raptor", "Moros", "Triceratops", "Nasutoceratops");
     Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
-    Caller.F4("Gallimimus", "Indor", "Carno", "Spino");
+    Caller.F4("Gallimimus", "Indor", "Carno", "Spinosaurus", "T-Rex");
     Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus");
   }
 }

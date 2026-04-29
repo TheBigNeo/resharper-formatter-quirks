@@ -29,4 +29,16 @@ public class MyReference
     StringSetting shutdownActions = new("9acd45ec-e8b9-45ad-b136-ecdeecd87074", "Shutdown Actions", ++settingsSortIndex, false, HtmlFieldType.Text, null);
     StringSetting startupActions = new("caf5ff1a5983", "Startup Actions", ++settingsSortIndex, false, HtmlFieldType.Text, null);
   }
+
+  static void CallFunctions()
+  {
+    Caller.F1("T-Rex",  "Raptor",        "Moros",         "Triceratops", "Parasaurolophus");
+    Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F2("Gallimimus", "Indor", "Carno", "Spinosaurus");
+    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus", "Iguanodon", "Oviraptor");
+    Caller.F3("T-Rex", "Raptor", "Moros", "Triceratops", "Nasutoceratops");
+    Caller.F1("Ankylo", "Tyrannosaurus", "Indominus rex", "Brachio");
+    Caller.F4("Gallimimus", "Indor", "Carno", "Spinosaurus", "T-Rex");
+    Caller.F1("Veloci", "Baryo", "Moso", "Dilophosaurus");
+  }
 }
