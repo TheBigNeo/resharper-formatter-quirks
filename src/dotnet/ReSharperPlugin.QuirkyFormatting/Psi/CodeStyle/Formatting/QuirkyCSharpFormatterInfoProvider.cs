@@ -104,13 +104,13 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
             .Where(
                 Left().Satisfies(
                     (node, _) =>
-                        node is IExpressionStatement expressionStatement &&
+                        node.NodeOrNull is IExpressionStatement expressionStatement &&
                         expressionStatement.HasLocalFunctionInvocation()
                 ),
                 Right().Satisfies(
                     (node, _) =>
-                        node is IDeclarationStatement { LocalFunctionDeclaration: { } localFunctionDeclaration }
-                        && node.LeftSiblings().OfType<IExpressionStatement>().FirstOrDefault() is
+                        node.NodeOrNull is IDeclarationStatement { LocalFunctionDeclaration: { } localFunctionDeclaration }
+                        && node.NodeOrNull.LeftSiblings().OfType<IExpressionStatement>().FirstOrDefault() is
                             { } expressionStatement
                         && expressionStatement.GetInvokedLocalFunctionDeclarations().Contains(localFunctionDeclaration)
                 )
@@ -133,7 +133,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
         DescribeWithExternalKey<QuirkyFormattingSettingsKey, IntAlignRule>()
             .Name("ALIGN_COMMAS_IN_ATTRIBUTE_INVOCATIONS")
             .Where(
-                Parent().Satisfies((node, _) => node is IAttribute),
+                Parent().Satisfies((node, _) => node.NodeOrNull is IAttribute),
                 Right().HasType(CSharpTokenType.COMMA)
             )
             .SwitchOnExternalKey(
@@ -143,7 +143,7 @@ public class QuirkyCSharpFormatterInfoProvider : CSharpFormatterInfoProviderPart
                     {
                         if (formattingRangeContext == null && context == null) return null;
 
-                        var attribute = (IAttribute)((FormattingRangeContext)formattingRangeContext)?.Parent;
+                        var attribute = ((FormattingRangeContext)formattingRangeContext)?.Parent.NodeOrNull as IAttribute;
 
                         if (attribute?.Name == null) return null;
 
